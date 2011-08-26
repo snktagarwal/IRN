@@ -1,0 +1,29 @@
+Network Growth Model
+-------------------
+
+The relevant script is kept in the folder bipartite_growth. The following are parameters to the script, parallel.py.
+
+1. \mu - u
+2. \gamma - y
+3. n
+4. t
+
+The script runs in various mode which are:
+1. Run the parallel attachment with replacement
+2. Run the parallel attachment without replacement
+3. Run the sequential attachment model
+4. Generate theoretical model for sequential attachment model
+
+Currently the way to run the script is rather obscure. The values can be easily modified in the main function( at the end ), though running various models requires some knowledge of code.
+
+TODO: Change all the running variations in command line and document.
+
+Directory Structure
+-------------------
+
+The script requires to have a folder, "datasets" w.r.t to it's execution location. No other specific requirement exists.
+
+Dependencies
+------------
+
+Depends heavily on Numpy( python Numberical Framework ) and networkx( Python Network Analysis Framework ).

@@ -27,3 +27,34 @@ Dependencies
 ------------
 
 Depends heavily on Numpy( python Numberical Framework ) and networkx( Python Network Analysis Framework ).
+
+Running Info
+-----------
+
+This script under, crawlRunning.py crawls information about currently running trains for IRN. The sample can be seen at: http://www.trainenquiry.com/indexNS.aspx.
+
+The current script iterates over train numbers, and for each train all it's stations. The data crawled is in the format:
+
+Train, Station, Date, Expected Arrival, Expected Departure, Actual Arrival and Actual Departure.
+
+Hence it captures the essence network delay. It can be extremely useful for some of the Network Analysis.
+
+Directory Structure
+------------------
+
+The end of script specifies the directory name. It is currently of the format crawl-yyyy-mm-dd
+
+Dependencies
+------------
+
+Packages: BeautifulSoup for parsing the HTML files
+Data: TrainStation information in the format of Train and the Stations it stops at.
+
+How to run
+---------
+
+python crawlRunning.py TrainStation_2010.txt NODEBUG old
+
+NODEBUG - Defaul mode to be used while crawling
+old - It specifies that the train numbers are in old format, used in the TrainStation2010.txt file.
+

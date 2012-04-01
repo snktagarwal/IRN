@@ -75,7 +75,7 @@ def getAvgDelayPerSegmentForAllFiles(delay_set):
 
 def new_test():
 
-  handle = DailySets(glob.glob('daily_data/*.out'))
+  handle = DailySets(glob.glob('daily_data/*23.out'))
   handle.index()
 
   for idx in handle.idx_list:
@@ -83,9 +83,6 @@ def new_test():
     idx.dailyAverageTrafficPS()
     idx.hourlyAverageTrafficPS()
     idx.hourlyAverageDelayPS()
-
-    #print idx.daily_traffic
-    #print idx.daily_delay
 
   handle.totalAverageTraffic()
   handle.totalAverageDelay()
@@ -132,8 +129,21 @@ def getSegmentsSortedByDelay(handle):
     print seg_del_list_sorted[i][0]
     print seg_del_list_sorted[i][1]
 
+def getTimeTableAugmented():
+
+  c = Indexing('delay_profile/datasets/NewTrainStationDetail.txt')
+  c.constructTimeTableIndex()
+  c.augmentTimeTableWithSegments()
+  c.printAugmentedTimeTableP('NewTrainStationDetailWSegments.p')
+  idx = c.tt_idx
+
+  # Some debugging info
+  print map(lambda x: [x.stn_nm, x.seg_info, x.src_dist ], idx['12280'].stn_list)
+  return idx
+
 
 if __name__=='__main__':
   #d_s = getDelayForEachFile('daily_data/')
   #getAvgDelayPerSegmentForAllFiles(d_s)
   new_test()
+  #getTimeTableAugmented()

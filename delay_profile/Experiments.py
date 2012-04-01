@@ -42,6 +42,18 @@ class Experiments:
     # Return the top n
     return l[:n]
 
+  def correlateTrafficAndDelay(self):
+
+    """ Correlates each row of traffic and delay matrix """
+
+    delay = self.seg_hour_delay_mat
+    traf  = self.seg_hour_traffic_mat
+
+    corr_vec = map(lambda i: pearsonr( \
+        list(delay[i].itervalues()), list(traf[i].itervalues()))[0], \
+        range(len(Segments.all_segments)))
+
+    return corr_vec
 
 if __name__=='__main__':
 
@@ -61,7 +73,12 @@ if __name__=='__main__':
 
   for t_d in top_traf:
 
-    print t_d[0], t_d[1], t_d[2]
+  # Correlation of traffic and delay
 
+  print '\n\nCORRELATION'
+  print '-'*len('Correlation')
+  corr_vec = e.correlateTrafficAndDelay()
 
+  for i in range(len(Segments.all_segments)):
 
+    print Segments.all_segments[i], corr_vec[i]

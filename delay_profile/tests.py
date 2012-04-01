@@ -84,28 +84,27 @@ def new_test():
     idx.hourlyAverageTrafficPS()
     idx.hourlyAverageDelayPS()
 
-  handle.totalAverageTraffic()
-  handle.totalAverageDelay()
-  handle.totalHourlyTraffic()
-  handle.totalHourlyDelay()
+  handle.hourVsSegmentDelayMat()
+  handle.hourVsSegmentTrafficMat()
 
+  handle.totalAverageTrafficPS()
+  handle.totalAverageTrafficPHS()
 
-  for i in range(len(Segments.all_segments)):
-    print Segments.all_segments[i]
-    print handle.total_hourly_traffic[i]
-    print handle.total_average_traffic[i]
-    print handle.total_hourly_delay[i]
-    print handle.total_average_delay[i]
+  handle.totalAverageDelayPS()
+  handle.totalAverageDelayPHS()
 
-  getSegmentsSortedByTraffic(handle)
-  getSegmentsSortedByDelay(handle)
+  print 'NEW'
+  print handle.total_average_traffic_ps
 
-  #handle.plotHourlyTraffic()
-  #handle.plotHourlyDelay()
-  #handle.plotHourlyDelayPS()
-  #handle.plotHourlyTrafficPS()
-  #handle.corrHourlyTrafficDelayPS()
-  handle.plotTrafficVsDelayHourly()
+  #getSegmentsSortedByTraffic(handle)
+  #getSegmentsSortedByDelay(handle)
+
+  ##handle.plotHourlyTraffic()
+  ##handle.plotHourlyDelay()
+  ##handle.plotHourlyDelayPS()
+  ##handle.plotHourlyTrafficPS()
+  ##handle.corrHourlyTrafficDelayPS()
+  #handle.plotTrafficVsDelayHourly()
 
 def getSegmentsSortedByTraffic(handle):
 

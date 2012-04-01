@@ -7,6 +7,7 @@ import Segments
 from Utilities import *
 from scipy.stats.stats import pearsonr
 import pickle
+import copy
 
 util = UtilitiesStat()
 
@@ -641,91 +642,92 @@ class DailySets:
       #idx.normalizeDelay()
       self.idx_list.append(idx)
 
-  def totalAverageTraffic(self):
-
-    """ Averages the various vectors of Traffic from days
-    and averages them out! """
-
-    self.total_average_traffic = []
-
-    for i in range(len(Segments.all_segments)):
-      t = 0
-      for idx in self.idx_list:
-        t = t + idx.daily_traffic[i]
-      t = float(t)/len(self.idx_list)
-      self.total_average_traffic.append(t)
-
-  def totalAverageDelay(self):
-
-    """ Averages the various vectors of Traffic from days
-    and averages them out! """
-
-    self.total_average_delay= []
-
-    for i in range(len(Segments.all_segments)):
-      t = 0
-      for idx in self.idx_list:
-        t = t + idx.daily_delay[i]
-      t = float(t)/len(self.idx_list)
-      self.total_average_delay.append(t)
-
-  def totalHourlyTraffic(self):
-
-    self.total_hourly_traffic = []
-
-    for i in range(len(Segments.all_segments)):
-      t = [0]*len(self._hours)
-      for j in range(len(self._hours)):
-        for idx in self.idx_list:
-          t[j] = t[j] + idx.hourly_traffic_dict[i][j]
-      # average over the number of days
-      t = map(lambda x: float(x)/len(self.idx_list), t)
-      self.total_hourly_traffic.append(t)
-
-    #for i in range(len(Segments.all_segments)):
-    #  print Segments.all_segments[i], self.total_hourly_traffic[i], \\
-    #      sum(self.total_hourly_traffic[i])
-
-  def totalHourlyDelay(self):
-
-    self.total_hourly_delay = []
-
-    for i in range(len(Segments.all_segments)):
-      t = [0]*len(self._hours)
-      for j in range(len(self._hours)):
-        for idx in self.idx_list:
-          t[j] = t[j] + idx.hourly_delay_dict[i][j]
-      # Average it over the number of days
-      t = map(lambda x: float(x)/len(self.idx_list), t)
-      self.total_hourly_delay.append(t)
-
   def hourVsSegmentDelayMat(self):
 
     """ Constructs a segment vs hours matrix ( 54 x 12 ) which contains
     Delay metrics """
 
-    self.seg_hour_del_mat = [[0]*len(self._hours)]*len(Segments.all_segments)
+    self.seg_hour_delay_mat = None
 
+    for idx in self.idx_list:
+
+      # Create a copy if still none
+      if not self.seg_hour_delay_mat:
+        self.seg_hour_delay_mat = copy.deepcopy(idx.hourly_delay_dict)
+        continue
+
+      # Update
+      for i in range(len(Segments.all_segments)):
+        for j in range(len(self._hours)):
+          self.seg_hour_delay_mat[i][j] += idx.hourly_delay_dict[i][j]
+
+    # Average
     for i in range(len(Segments.all_segments)):
       for j in range(len(self._hours)):
-        for idx in self.idx_list:
-          self.seg_hour_del_mat[i][j] += idx.hourly_delay_dict[i][j]
-        self.seg_hour_del_mat[i][j] = float(self.seg_hour_del_mat[i][j])/len(self.seg_hour_del_mat)
+        self.seg_hour_delay_mat[i][j] = float(self.seg_hour_delay_mat[i][j])/len(self.idx_list)
 
   def hourVsSegmentTrafficMat(self):
 
     """ Constructs a segment vs hours matrix ( 54 x 12 ) which contains
-    Traffic metrics """
+    Delay metrics """
 
-    self.seg_hour_traf_mat = [[0]*len(self._hours)]*len(Segments.all_segments)
+    self.seg_hour_traffic_mat = None
 
+    for idx in self.idx_list:
+
+      # Create a copy if still none
+      if not self.seg_hour_traffic_mat:
+        self.seg_hour_traffic_mat = copy.deepcopy(idx.hourly_traffic_dict)
+        continue
+
+      # Update
+      for i in range(len(Segments.all_segments)):
+        for j in range(len(self._hours)):
+          self.seg_hour_traffic_mat[i][j] += idx.hourly_traffic_dict[i][j]
+
+    # Average
     for i in range(len(Segments.all_segments)):
       for j in range(len(self._hours)):
-        for idx in self.idx_list:
-          self.seg_hour_traf_mat[i][j] += idx.hourly_traffic_dict[i][j]
-        self.seg_hour_traf_mat[i][j] = float(self.seg_hour__traf_mat[i][j])/len(self.seg_hour_traf_mat)
+        self.seg_hour_traffic_mat[i][j] = float(self.seg_hour_traffic_mat[i][j])/len(self.idx_list)
 
 
+  def totalAverageTrafficPS(self):
+    """ Total hourly traffic for each hour slot using the master matrix """
+    self.total_average_traffic_ps = \
+        map(lambda x: sum(x.itervalues()), self.seg_hour_traffic_mat)
+
+
+  def totalAverageTrafficPHS(self):
+
+    """ Total hourly traffic for each hour slot using the master matrix """
+
+    self.total_average_traffic_phs = []
+
+    for j in range(len(self._hours)):
+      # Sum up over the column; and avg it
+      val = 0
+      for seg in self.seg_hour_traffic_mat:
+        val = val + seg[j]
+      self.total_average_traffic_phs.append(val)
+
+  def totalAverageDelayPS(self):
+    """ Total hourly traffic for each hour slot using the master matrix """
+    self.total_average_delay_ps = \
+        map(lambda x: sum(x.itervalues()), self.seg_hour_delay_mat)
+
+
+  def totalAverageDelayPHS(self):
+
+    """ Total hourly delay for each hour slot using the master matrix """
+
+    self.total_average_delay_phs = []
+
+    for j in range(len(self._hours)):
+      # Sum up over the column; and avg it
+      val = 0
+      for seg in self.seg_hour_delay_mat:
+        val += seg[j]
+      self.total_average_delay_phs.append(val)
 
   def plotHourlyTraffic(self):
 

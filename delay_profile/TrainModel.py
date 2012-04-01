@@ -642,7 +642,7 @@ class DailySets:
       #idx.normalizeDelay()
       self.idx_list.append(idx)
 
-  def hourVsSegmentDelayMat(self):
+  def hourVsSegmentDelayMat(self, p = True):
 
     """ Constructs a segment vs hours matrix ( 54 x 12 ) which contains
     Delay metrics """
@@ -666,7 +666,11 @@ class DailySets:
       for j in range(len(self._hours)):
         self.seg_hour_delay_mat[i][j] = float(self.seg_hour_delay_mat[i][j])/len(self.idx_list)
 
-  def hourVsSegmentTrafficMat(self):
+    # If pickle is true then we save the matrix in a picked file
+    if p:
+      pickle.dump(self.seg_hour_delay_mat, open('pickled/SegHourDelayMat.p','w'))
+
+  def hourVsSegmentTrafficMat(self, p = True):
 
     """ Constructs a segment vs hours matrix ( 54 x 12 ) which contains
     Delay metrics """
@@ -690,11 +694,17 @@ class DailySets:
       for j in range(len(self._hours)):
         self.seg_hour_traffic_mat[i][j] = float(self.seg_hour_traffic_mat[i][j])/len(self.idx_list)
 
+    if p:
+      pickle.dump(self.seg_hour_traffic_mat ,open('pickled/SegHourTrafficMat.p','w'))
+
+
 
   def averageTrafficPS(self):
     """ Total hourly traffic for each hour slot using the master matrix """
     self.total_average_traffic_ps = \
         map(lambda x: sum(x.itervalues()), self.seg_hour_traffic_mat)
+    if p:
+      pickle.dump(file('SegHourDelayMat.p','w'), self.seg_hour_delay_mat)
 
 
   def averageTrafficPHS(self):

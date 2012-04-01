@@ -87,11 +87,11 @@ def new_test():
   handle.hourVsSegmentDelayMat()
   handle.hourVsSegmentTrafficMat()
 
-  handle.totalAverageTrafficPS()
-  handle.totalAverageTrafficPHS()
+  handle.averageTrafficPS()
+  handle.averageTrafficPHS()
 
-  handle.totalAverageDelayPS()
-  handle.totalAverageDelayPHS()
+  handle.averageDelayPS()
+  handle.averageDelayPHS()
 
   print 'NEW'
   print handle.total_average_traffic_ps

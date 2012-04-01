@@ -691,13 +691,13 @@ class DailySets:
         self.seg_hour_traffic_mat[i][j] = float(self.seg_hour_traffic_mat[i][j])/len(self.idx_list)
 
 
-  def totalAverageTrafficPS(self):
+  def averageTrafficPS(self):
     """ Total hourly traffic for each hour slot using the master matrix """
     self.total_average_traffic_ps = \
         map(lambda x: sum(x.itervalues()), self.seg_hour_traffic_mat)
 
 
-  def totalAverageTrafficPHS(self):
+  def averageTrafficPHS(self):
 
     """ Total hourly traffic for each hour slot using the master matrix """
 
@@ -710,13 +710,13 @@ class DailySets:
         val = val + seg[j]
       self.total_average_traffic_phs.append(val)
 
-  def totalAverageDelayPS(self):
+  def averageDelayPS(self):
     """ Total hourly traffic for each hour slot using the master matrix """
     self.total_average_delay_ps = \
         map(lambda x: sum(x.itervalues()), self.seg_hour_delay_mat)
 
 
-  def totalAverageDelayPHS(self):
+  def averageDelayPHS(self):
 
     """ Total hourly delay for each hour slot using the master matrix """
 

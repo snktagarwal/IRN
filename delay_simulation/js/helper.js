@@ -446,74 +446,56 @@ function search_seg(v){
 	}
 }
 
+function sort_traffic(a,b){
+	return b.traffic - a.traffic;
+}
+function segment_obj(sname, traffic){
+	this.sname = sname;
+	this.traffic = traffic;
+}
+
 function busy3high_normal(){
 	var busy1_name, busy2_name, busy3_name;
-	var busy1_info = 0, busy2_info = 0, busy3_info = 0;
-	var i;
-	for(i in segments_normal)
-	{
-		if(segments_normal[i] > busy1_info)
-		{
-			busy1_info = segments_normal[i];
-			var s = Segments[i].segment;
-			busy1_name = s.seg_name;
-		}		
+	var seg_traffic_array = new Array();
+	
+	/* Create an array of objects for various segments */
+	for(var i in segments_normal){
+		//alert(segments_normal[i]);
+		var seg_obj = new segment_obj(Segments[i].segment.seg_name, segments_normal[i]);
+		seg_traffic_array[i] = seg_obj;
 	}
-	for(i in segments_normal)
-	{
-		if(segments_normal[i] > busy2_info && segments_normal[i] < busy1_info)
-		{
-			busy2_info = segments_normal[i];
-			var s = Segments[i].segment;
-			busy2_name = s.seg_name;
-		}		
+	
+	
+	/* Now sort them */
+	seg_traffic_array.sort(sort_traffic);
+	
+	/* Display in HTML */
+	$("#bus_seg_normal").children().remove();
+	for(var i in seg_traffic_array){
+		$("#bus_seg_normal").append('<li>'+seg_traffic_array[i].sname+'\t'+seg_traffic_array[i].traffic+'</li>');
 	}
-	for(i in segments_normal)
-	{
-		if(segments_normal[i] > busy3_info && segments_normal[i] < busy2_info)
-		{
-			busy3_info = segments_normal[i];
-			var s = Segments[i].segment;
-			busy3_name = s.seg_name;
-		}		
-	}
-	$("#busy1_normal").html("1. " + busy1_name + "\t" + busy1_info);
-	$("#busy2_normal").html("2. " + busy2_name + "\t" + busy2_info);
-	$("#busy3_normal").html("3. " + busy3_name + "\t" + busy3_info);
+	
+	
 }
 
 function busy3high_delay(){
 	var busy1_name, busy2_name, busy3_name;
 	var busy1_info = 0, busy2_info = 0, busy3_info = 0;
-	var i;
-	for(i in segments_delay)
-	{
-		if(segments_delay[i] > busy1_info)
-		{
-			busy1_info = segments_delay[i];
-			var s = Segments[i].segment;
-			busy1_name = s.seg_name;
-		}		
+	var seg_traffic_array = new Array();
+	
+	/* Create an array of objects for various segments */
+	for(var i in segments_normal){
+		//alert(segments_normal[i]);
+		var seg_obj = new segment_obj(Segments[i].segment.seg_name, segments_delay[i]);
+		seg_traffic_array[i] = seg_obj;
 	}
-	for(i in segments_delay)
-	{
-		if(segments_delay[i] > busy2_info && segments_delay[i] < busy1_info)
-		{
-			busy2_info = segments_delay[i];
-			var s = Segments[i].segment;
-			busy2_name = s.seg_name;
-		}		
+	
+	/* Now sort them */
+	seg_traffic_array.sort(sort_traffic);
+	
+	/* Display in HTML */
+	$("#bus_seg_delay").children().remove(); 
+	for(var i in seg_traffic_array){
+		$("#bus_seg_delay").append('<li>'+seg_traffic_array[i].sname+'\t'+seg_traffic_array[i].traffic+'</li>');
 	}
-	for(i in segments_delay)
-	{
-		if(segments_delay[i] > busy3_info && segments_delay[i] < busy2_info)
-		{
-			busy3_info = segments_delay[i];
-			var s = Segments[i].segment;
-			busy3_name = s.seg_name;
-		}		
 	}
-	$("#busy1_delay").html("1. " + busy1_name + "\t" + busy1_info);
-	$("#busy2_delay").html("2. " + busy2_name + "\t" + busy2_info);
-	$("#busy3_delay").html("3. " + busy3_name + "\t" + busy3_info);
-}

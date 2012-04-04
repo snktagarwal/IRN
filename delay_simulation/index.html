@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCu6j3hJiFtxsHfFXt5qCXK-kL81Vxvqj4&sensor=false" type="text/javascript"></script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="js/epoly_v3.js" type="text/javascript"></script>
+    <script src="js/jstat.js" type="text/javascript"></script>
+    <!--script src="../NewTrainStationWSegmentsWDays.min.json" type="text/javascript"></script-->
+  </head>
+  <body  onunload="GUnload()" style="bgcolor: #ff0000; width: 1200px">
+    <table>
+
+	<tr> <!-- Information row -->
+		<td style="verticle-align: top; width: 6000px">
+		  
+			<button onclick="reset();" value="Reset" >Reset</button>
+			<button onclick="start();" id="anim" >Start</button>
+			<div id="time"><b>Time</b>(day:hr::min): 0 :: 0 :: 0</div>
+			Speed:&nbsp &nbsp <input id="range" type="range" min="1" max="40" value="6" step="1" onkeyup="showValue(this.value)" /><span id="timeScale" >6</span>
+			<br/>
+			<br/>
+		  
+		 </td>
+		 <td>
+			 
+			<button onCLick="setTime();" id="setTime" >Set</button>
+			<button onCLick="viewAsyncTraffic();" id="viewAsyncTraffic" >View</button>
+			<br/>
+			Set Time:<input id="Trange" type="range" min="1" max="48" value="0" step="1" width="300px" onkeyup="showValueTime(this.value)" /> <span id="time-line" > 00::00 </span>
+			<div id="SegTot_normal">Total running trains(MAP_NORMAL): </div>  
+			<div id="SegTot_delay">Total running trains(MAP_DELAY) : </div>  
+		</tr>
+		
+		  <!---
+		  Enter Segment No.<input type=text onchange="search_seg(this.value);"/>
+		  <div id="segName">Segment Name: </div>
+		  <div id="segInfo">Number of Running Trains: </div>
+		  --->
+		  
+		  <!---
+		  <div>
+			<h5>Graphical Visualisation:</h5>
+			<div id="placeholder" style="width:600px;height:250px"></div>
+		  </div>
+		  Enter Segment No.<input type=text onchange="search(this.value);"/>
+		  <div id="segInfo" style="border-style:solid;border-width:5px;height:150px;width:400px"/>
+		  --->
+	<tr>
+		</td>
+		
+		<td>
+		  <div id="map_normal" style="width: 700px;height: 700px;position: absolute"></div>
+		  <div id="overlay_normal"style="width: 700px;height: 700px; background-color: #000; opacity: 0.6"/>
+		</td>
+		<td>
+		  <div id="map_delay" style="width: 700px;height: 700px;position: absolute"></div>
+		  <div id="overlay_delay"style="width: 700px;height: 700px; background-color: #000; opacity: 0.6"/>
+		</td>
+	</tr> <!-- Map table row ends -->
+	 
+	<tr> <!-- Bussiest segments row -->
+	   <td>
+		<h5>Three Bussiest Segments(MAP_NORMAL)</h5>
+		  <div id="busy1_normal"></div>
+		  <div id="busy2_normal"></div>
+		  <div id="busy3_normal"></div>
+	   </td>
+	   <td>
+		<h5>Three Bussiest Segments(MAP_DELAY)</h5>
+		  <div id="busy1_delay"></div>
+		  <div id="busy2_delay"></div>
+		  <div id="busy3_delay"></div>
+	   </td>
+	</tr> <!-- Bussiest segments row ends -->
+
+    </table>
+    <script src="js/helper.js" type="text/javascript"></script>
+    <!--div onclick="MoveMarker()";> This is the place </div>
+  <div id="encodedPolyline" onclick="setMarker()"><hr/>This is the encoded place<br/></div><hr/>
+  <div id="distance">Distance <br/></div-->
+    <script language="javascript" type="text/javascript" src="js/flot/jquery.js"></script>
+    <script language="javascript" type="text/javascript" src="js/flot/jquery.flot.js"></script>
+  </body>
+</html>

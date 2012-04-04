@@ -1,0 +1,20 @@
+How to run this application
+==========================
+
+The ideal way is to have a apache.conf file (as in this folder) and link it
+with you main apache2.conf file. In your /etc/apache2/apache.conf file
+put this line:
+* Include "/home/sanket/irn-hacku/apache.conf" -- this is for me
+
+Next you need to configure the local apache.conf file, there is a directory location. Just change it to wherever your source is, ex:
+* Alias "/home/sanket/irn-hacku/src/"
+
+To set the config right, just do this:
+
+* sudo service apache2 restart
+
+Your code should be available at:
+
+* http://localhost/irn/
+
+Just make sure your browser has proxy disabled

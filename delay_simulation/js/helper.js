@@ -449,9 +449,10 @@ function search_seg(v){
 function sort_traffic(a,b){
 	return b.traffic - a.traffic;
 }
-function segment_obj(sname, traffic){
+function segment_obj(sname, traffic, trn_list){
 	this.sname = sname;
 	this.traffic = traffic;
+	this.trn_list = trn_list;
 }
 
 function busy3high_normal(){
@@ -461,7 +462,7 @@ function busy3high_normal(){
 	/* Create an array of objects for various segments */
 	for(var i in segments_normal){
 		//alert(segments_normal[i]);
-		var seg_obj = new segment_obj(Segments[i].segment.seg_name, segments_normal[i]);
+		var seg_obj = new segment_obj(Segments[i].segment.seg_name, segments_normal[i], SegTrainList_normal[i]);
 		seg_traffic_array[i] = seg_obj;
 	}
 	
@@ -470,9 +471,19 @@ function busy3high_normal(){
 	seg_traffic_array.sort(sort_traffic);
 	
 	/* Display in HTML */
-	$("#bus_seg_normal").children().remove();
+	$("#bus_seg_normal").children().remove(); 
 	for(var i in seg_traffic_array){
-		$("#bus_seg_normal").append('<li>'+seg_traffic_array[i].sname+'\t'+seg_traffic_array[i].traffic+'</li>');
+		$("#bus_seg_normal").append('<li>'+'<b>'+seg_traffic_array[i].sname+'\t'+seg_traffic_array[i].traffic+'</b>'+'</li>');
+		var s = '<li>';
+		seg_traffic_array[i].trn_list.sort();
+		for(var j in seg_traffic_array[i].trn_list)
+		{
+			s = s + seg_traffic_array[i].trn_list[j] + '\t';
+			if((j % 10) == 9)
+				s = s + "</li>" + "<li>";			
+		}
+		s = s + '</li>';
+		$("#bus_seg_normal").append(s);
 	}
 	
 	
@@ -486,7 +497,7 @@ function busy3high_delay(){
 	/* Create an array of objects for various segments */
 	for(var i in segments_normal){
 		//alert(segments_normal[i]);
-		var seg_obj = new segment_obj(Segments[i].segment.seg_name, segments_delay[i]);
+		var seg_obj = new segment_obj(Segments[i].segment.seg_name, segments_delay[i], SegTrainList_delay[i]);
 		seg_traffic_array[i] = seg_obj;
 	}
 	
@@ -496,6 +507,16 @@ function busy3high_delay(){
 	/* Display in HTML */
 	$("#bus_seg_delay").children().remove(); 
 	for(var i in seg_traffic_array){
-		$("#bus_seg_delay").append('<li>'+seg_traffic_array[i].sname+'\t'+seg_traffic_array[i].traffic+'</li>');
+		$("#bus_seg_delay").append('<li>'+'<b>'+seg_traffic_array[i].sname+'\t'+seg_traffic_array[i].traffic+'</b>'+'</li>');
+		var s = '<li>';
+		seg_traffic_array[i].trn_list.sort();
+		for(var j in seg_traffic_array[i].trn_list)
+		{
+			s = s + seg_traffic_array[i].trn_list[j] + '\t';
+			if((j % 10) == 9)
+				s = s + "</li>" + "<li>";			
+		}
+		s = s + '</li>';
+		$("#bus_seg_delay").append(s);
 	}
-	}
+}

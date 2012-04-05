@@ -39,6 +39,28 @@ class Station:
     self.del_dep = del_dep
     self.src_dist = src_dist
 
+  def flush(self):
+
+    # Flushes information about arrival and departures
+    # It is used to create a new time table containing delay information
+
+    self.instances = 0
+    self.avg_arr = self.avg_dep = -1 # That's all we really need!
+
+  def add_delay(self, stn):
+
+    """ Adds the delayed arrival and departure times """
+    self.instances = self.instances + 1
+    self.avg_arr = self.avg_arr + stn.act_arr
+    self.avg_dep = self.avg_dep + stn.act_dep
+
+  def avg(self):
+
+    """ Averages the arr and dep times, look at the above funciton """
+    if self.instances:
+      self.avg_arr = int(float(self.avg_arr)/self.instances)
+      self.avg_dep = int(float(self.avg_dep)/self.instances)
+
   def _print(self):
     print 'Train Name: ' + str(self.tr_nm)
     print 'Train No.: ' + str(self.tr_no)

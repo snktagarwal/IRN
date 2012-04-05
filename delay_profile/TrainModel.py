@@ -375,7 +375,6 @@ class Segment:
     else:
       # Process for hourly stats
       self.processHourly(train, lidx, ridx)
-      # Process for cumulative total stats
       self.daily_traffic[train.tr_no] = 1
 
 class Indexing:
@@ -414,7 +413,6 @@ class Indexing:
       # Read each station
       while parts:
         [stn_code, arr_time, dep_time, dist_source] = parts[0:4]
-        print parts[0:4]
         arr_time = util.toMin(arr_time)
         dep_time = util.toMin(dep_time)
         parts = parts[4:]

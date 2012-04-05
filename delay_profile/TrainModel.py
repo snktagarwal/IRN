@@ -829,80 +829,82 @@ class DailySets:
         val += seg[j]
       self.total_average_delay_phs.append(val)
 
-  def plotHourlyTraffic(self):
+  def constructTimeTableFromDelay(self):
 
-    """ For a first view let us create segmentsxhours insatances of
-    delay. And plot them with x axis as hours and y axis as the corresponding
-    delay. """
+    """ It produces a time table, exactly in the format currently specified
+    in datasets/NewTimTableDetail.txt.
 
-    f = file('plots/HourlyTrafficOfAllSegments','w')
+    The way it does is to first use each indexing frame and then find out the
+    average time at which a train reaches a station. This gives us augmented
+    information about a train's delyed reaching time. """
 
-    for hs in range(len(self._hours)):
-      for e1 in self.total_hourly_traffic:
-        f.write(str(self._hours[hs]/self._split)[:5]+' '+str(e1[hs])[:5]+'\n')
+    # First read the existing time table to get information about trains
+    # and the corresponding stations they stop at
 
-  def plotHourlyDelay(self):
+    time_table = {}
 
-    """ For a first view let us create segmentsxhours insatances of
-    delay. And plot them with x axis as hours and y axis as the corresponding
-    delay. """
+    handle = Indexing('datasets/NewTrainStationDetail.txt')
+    tt_idx = handle.constructTimeTableIndex()
+    output = file('datasets/NewTrainStationDetailDelay.txt', 'w')
 
-    f = file('plots/HourlyDelayOfAllSegments','w')
+    # This is a simple index created from the actual time table
+    # Let's flush it or adding delay information
 
-    for hs in range(len(self._hours)):
-      for e1 in self.total_hourly_delay:
-        f.write(str(self._hours[hs]/self._split)[:5]+' '+str(e1[hs])[:5]+'\n')
-  def plotTrafficVsDelayHourly(self):
+    for (tr_no, train) in tt_idx.iteritems():
+      for stn in train.stn_list:
+        stn.flush()
 
-    """ Construct a plot where x-axis is traffic, y-axis is delay and
-    color coding is done according to the hour. The simple way to do
-    this will be to, construct len(self._hours) file each containing a
-    list of traffic-vs-delay statistics (len(Segments.__all_segments))
-    actually . """
+    # Now lets add actual information from the indexed trains that we have
+    # got.
 
-    base = 'traffic-vs-delay/'
+    for idx in self.idx_list:
 
-    for hs in range(len(self._hours)):
-      f = file(base + str(hs) + '.dat', 'w')
-      for i in range(len(Segments.all_segments)):
-        f.write("%f\t%f\n" % (self.total_hourly_traffic[i][hs], self.total_hourly_delay[i][hs]))
-      f.close()
+      # Take the index and add information to our time table
+      for (tr_no, train) in idx.idx.iteritems():
+        if tr_no not in tt_idx.keys():
+          #print tr_no, 'not found in static rail database'
+          continue
 
-  def plotHourlyDelayPS(self):
+        # It might happen that some trains are not collected completely
+        # in which case the number of stations are not complete,
+        # hence we need to align the stations appropriately
 
-    """ For each segment create points for each bin and store in file """
+        le = len(tt_idx[tr_no].stn_list)
+        align_vec = [-1] * len(train.stn_list)
 
-    for i in range(len(self.total_hourly_delay)):
-      f = file('plots/'+Segment.getNameStat(Segments.all_segments[i])+'.hourly_delay','w')
-      for hs in range(len(self._hours)):
-        f.write(str(hs)+' '+str(self.total_hourly_delay[i][hs])+'\n')
-      f.close()
+        #print tr_no, le, len(train.stn_list)
+        j = 0
+        for i in range(le):
 
-  def plotHourlyTrafficPS(self):
+          tt_code = Station.disambiguate(tt_idx[tr_no].stn_list[i].stn_code)
+          idx_code = Station.disambiguate(train.stn_list[j].stn_code)
+          if tt_code == idx_code:
+            align_vec[j] = i
+            j = j + 1
 
-    """ For each segment create points for each bin and store in file """
-
-    for i in range(len(self.total_hourly_traffic)):
-      f = file('plots/'+Segment.getNameStat(Segments.all_segments[i])+'.hourly_traffic','w')
-      for hs in range(len(self._hours)):
-        f.write(str(hs)+' '+str(self.total_hourly_traffic[i][hs])+'\n')
-      f.close()
-
-  def corrHourlyTrafficDelayPS(self):
-
-    """ Compute the delay and traffic vectors per hour and compute
-    the associated correlation """
-
-    corr_vec = map(lambda x: pearsonr( \
-        self.total_hourly_traffic[x], self.total_hourly_delay[x]), \
-        range(len(self.total_hourly_traffic)))
-
-    for i in range(len(Segments.all_segments)):
-
-      print Segment.getNameStat(Segments.all_segments[i]) \
-          + str(' ') + str(corr_vec[i][0])
+          if j == len(train.stn_list): break
 
 
+        # Now add the arr and dep time
 
+        for j in range(len(train.stn_list)):
+          if align_vec[j] != -1:
+            tt_idx[tr_no].stn_list[align_vec[j]].add_delay(train.stn_list[j])
 
+    # Take god's name and average
+    for (tr_no, train) in tt_idx.iteritems():
+      for stn in train.stn_list:
+        stn.avg()
 
+    # Let's see how the average go :P
+    for (tr_no, train) in tt_idx.iteritems():
+      output.write(tr_no+'||')
+      for stn in train.stn_list:
+        if not (stn.avg_arr == -1 and stn.avg_dep == -1):
+          output.write(stn.stn_code+'||'+str(stn.avg_arr)+'||'+str(stn.avg_dep)+'||'+str(stn.src_dist)+'||')
+      output.write('\n')
+    output.close()
+
+    handle.augmentTimeTableWithSegments()
+    handle.printAugmentedTimeTable('datasets/NewTrainStationDetailWDelayWSegments.txt')
+    handle.printAugmentedTimeTableP('pickled/NewTrainStationDetailWDelayWSegments.p')

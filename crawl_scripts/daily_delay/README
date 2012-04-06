@@ -1,0 +1,5 @@
+HOW TO RUN THE CRAWL SCRIPT
+==========================
+
+Ideally the run.sh should be put in the cron job, but for testing purposes
+you could simply do $ ./run.sh to run it.

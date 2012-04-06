@@ -66,7 +66,7 @@ def crawlDataWithDate(trainDetails, d, path):
     d1 = d.isoformat().split('-')
     for (k,v) in trainDetails.iteritems():
         for station in v:
-            crawlHTTP = "http://www.trainenquiry.com/RunningIslTrSt.aspx?tr="+str(k)+"&st="+str(station)+"+&dt="+d1[2]+"%2f"+d1[1]+"%2f"+d1[0]
+            crawlHTTP = "http://www.trainenquiry.com/o/RunningIslTrSt.aspx?tr="+str(k)+"&st="+str(station)+"+&dt="+d1[2]+"%2f"+d1[1]+"%2f"+d1[0]
             logger.info('Fetching: '+crawlHTTP)
             crawlOP = path+'/'+str(k)+'.'+str(station)+'.'+str(d)+'.html'
             logger.info('Putting: '+crawlOP)

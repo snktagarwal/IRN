@@ -100,21 +100,6 @@ def parseFile(filename, tno):
     ri.write('\n')
     ri.flush()
 
-def pruneCrawledTrains(trainDetails, crawled):
-    trainDetails1 = {}
-    for (k,v) in trainDetails.iteritems():
-
-        if k not in crawled:
-
-            trainDetails1[k] = v
-    return trainDetails1
-
-def backupRunningInfo(filename):
-
-    newFileName = filename+str(str(int(time.time())))
-
-    os.system('cp '+filename+' '+newFileName)
-
 
 if __name__=='__main__':
 

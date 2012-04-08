@@ -2,76 +2,77 @@
 import sys
 import os
 import logging
-import datetime
 from BeautifulSoup import BeautifulSoup
 import re
 from urlparse import urlparse
 from html2text import html2text
 from sets import Set
 import time
+import Utilities
+from datetime import date
+from dateutil.relativedelta import relativedelta
+import copy
 
-now = datetime.datetime.now()
+util = Utilities.UtilitiesStat()
+
+
+now = date.today() - relativedelta(days = 2)
+
 datestring = now.strftime("%Y-%m-%d")
-#datestring = '2012-02-28'
 running_info_out = 'RunningInfo-'+datestring+'.out'
-logger = logging.getLogger('myapp')
-hdlr = logging.FileHandler('crawlRunningInfo.log')
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-hdlr.setFormatter(formatter)
-logger.addHandler(hdlr)
-logger.setLevel(logging.INFO)
+print now
 
 ri = file(running_info_out, 'w')
 
-def parseRunningInfoOutput(filename):
+def parseTrainListNew(filename):
 
-    # parses and returns a list of train numbers already crawled
-    crawled = Set()
-    ri_out = file(filename, 'r')
+  """ Parses the list of train and stations including information about
+  timings """
 
-    ri_lines = ri_out.readlines()
+  f = file(filename, 'r')
+  lines = f.readlines()
 
-    for l in ri_lines:
+  trainDetails = {}
 
-        parts = l.split(':')
+  for l in lines:
 
-        if parts[0] == 'Train Number':
+    parts = l.split()
+    tr_no = parts[0]
+    parts = parts[1:]
+    trainDetails[tr_no] = []
 
-            crawled.add(str(parts[1].strip()))
+    while(len(parts)>0):
+      stn_code, sch_arr, sch_dep, src_dist = parts[0:4]
+      if sch_arr == 'Source': sch_arr = -1
+      else: sch_arr = util.toMin(sch_arr)
+      if sch_dep == 'Desitation': sch_dep = -1
+      else: sch_dep = util.toMin(sch_dep)
+      trainDetails[tr_no].append([stn_code, sch_arr, sch_dep])
+      parts = parts[4:]
 
-    return crawled
+  return trainDetails
 
-def parseTrainList(filename, type):
+def crawlDataWithDate(trainDetails, path):
 
-    # Crawls the file based on whether it is old or new.
-    # 'old' or 'new'
 
-    f = file(filename, 'r')
-    trainList = f.readlines()
-    trainDetails = {}
-    for t in trainList:
-
-        parts = t.strip().split('||')
-        trainNo = parts[0]
-        stnList = parts[1:]
-
-        if type == 'old':
-
-            key = trainNo
-            trainDetails[key] = stnList
-
-    return trainDetails
-
-def crawlDataWithDate(trainDetails, d, path):
-    d1 = d.isoformat().split('-')
     for (k,v) in trainDetails.iteritems():
-        for station in v:
+
+        d = date.today() - relativedelta(days = 2)
+        prev_arr = -10
+
+        for t in v:
+
+            # Check if the train changes day
+            if t[1] < prev_arr: d = d + relativedelta(days = +1)
+            prev_arr = t[1]
+
+            d1 = d.isoformat().split('-')
+
+            station = t[0]
             crawlHTTP = "http://www.trainenquiry.com/o/RunningIslTrSt.aspx?tr="+str(k)+"&st="+str(station)+"+&dt="+d1[2]+"%2f"+d1[1]+"%2f"+d1[0]
-            logger.info('Fetching: '+crawlHTTP)
-            crawlOP = path+'/'+str(k)+'.'+str(station)+'.'+str(d)+'.html'
-            logger.info('Putting: '+crawlOP)
+            crawlOP = path+'/'+str(k)+'.'+str(station)+'.'+str(now)+'.html'
             wgetCall = 'wget -o wget.log -O '+crawlOP+' \"'+crawlHTTP+'\"'
-            logger.info('Wget Call: '+wgetCall)
+            print wgetCall
             os.system(wgetCall)
             parseFile(crawlOP, str(k))
 
@@ -117,18 +118,13 @@ def backupRunningInfo(filename):
 
 if __name__=='__main__':
 
+    trainDetails = parseTrainListNew('NewTrainStationDetail.txt')
 
     filename = 'RunningInfo-'+datestring+'.out'
-    # Always backup before doing any changes. Backup
-    # to the current time
-    #backupRunningInfo('RunningInfo-2011-08-25.out')
-    #crawled = parseRunningInfoOutput('RunningInfo-2011-08-25.out')
-    trainDetails = parseTrainList(sys.argv[1],sys.argv[2])
+
     print trainDetails
+
     print 'Total trains: '+str(len(trainDetails))
-    #print 'Crawled Already: '+str(len(crawled))
-    if sys.argv[3] == 'recover':
-        trainDetails = pruneCrawledTrains(trainDetails, crawled)
-    print 'List to crawl: '+str(len(trainDetails))
+
     os.system('mkdir ./crawl-'+datestring)
-    crawlDataWithDate(trainDetails,  datetime.date(now.year,now.month,now.day),'./crawl-'+datestring)
+    crawlDataWithDate(trainDetails, './crawl-'+datestring)
